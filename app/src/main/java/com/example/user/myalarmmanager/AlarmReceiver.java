@@ -52,7 +52,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         intent.putExtra(EXTRA_MESSAGE, message);
         intent.putExtra(EXTRA_TYPE, type);
         String dateArray[] = date.split("-");
-        String timeArray[] = time.split("-");
+        String timeArray[] = time.split(":");
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, Integer.parseInt(dateArray[0]));
         calendar.set(Calendar.MONTH, Integer.parseInt(dateArray[1])-1);
@@ -65,12 +65,31 @@ public class AlarmReceiver extends BroadcastReceiver {
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         Toast.makeText(context, "One Time Alarm Set Up", Toast.LENGTH_SHORT).show();
     }
+    public void setRepeatingalarm(Context context, String type, String time, String message){
+        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, AlarmManager.class);
+        intent.putExtra(EXTRA_MESSAGE, message);
+        intent.putExtra(EXTRA_TYPE, type);
+        String timeArray[] = time.split(":");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeArray[0]));
+        calendar.set(Calendar.MINUTE, Integer.parseInt(timeArray[1]));
+        calendar.set(Calendar.SECOND, 0);
+        int requestCode = NOTIF_ID_ONETIME;
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, 0);
+
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        Toast.makeText(context, "Repeating Alarm Set Up", Toast.LENGTH_SHORT).show();
+    }
+
+
     public void cancelAlarm(Context context,String type){
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
         int requestCode = type.equalsIgnoreCase(TYPE_ONE_TIME) ? NOTIF_ID_ONETIME : NOTIF_ID_REPEATING;
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, 0);
         alarmManager.cancel(pendingIntent);
+        Toast.makeText(context, "Repeating Alarm Di Batalkan!", Toast.LENGTH_SHORT).show();
 
     }
 
